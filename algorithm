@@ -1,8 +1,137 @@
 /**
- * BinarySearch
- * Sorting
+ * Sorting : inserting sort, Quick sort, Merge Sort 
+ * BinarySearch 
  */
  
+//**********************************************************
+Simple introduction
+Inserting sort: Just sorting one by one, for the new element, which compare and scan from back to front
+Quick sort: First find a pivot and then devide all data to two areas: smaller or larger than the pivot. 
+            Continue to choose a pivot in each area, then devide data. 
+            // Until the the area only have last two data, then compare choose one become pivot, and put in correct order.           
+Merge sort: Firt devide the array to two part, then 2^2, then 2^3, after logN steps, the array become a single element.
+            Second, reverse the logN Steps, in each step, we order the element or the ordered array.
+
+
+//**********************************************************
+// Inserting sort for sorting INT
+//time complexity: O(n^2)
+//space complexity: O(1), since the array length would not change
+public void insertionSort(int[] array) {
+  for(int i=1; i<array.length; i++){
+    int cur = array[i];
+    int insertIndex = i - 1;
+    while(insertIndex >= 0 && array[insertIndex] > cur) {
+      array[insertIndex + 1] = array[insertIndex];
+      insertIndex--;
+    }
+    array[insertIndex + 1] = cur;
+  }
+}
+
+
+
+//**********************************************************
+/** 
+ * Quick Sort for sorting INT type
+ * Quick Sort is the fastest sorting
+ * https://www.youtube.com/watch?v=-5F4RafHEvs&ab_channel=%E5%B0%9A%E7%A1%85%E8%B0%B7IT%E5%9F%B9%E8%AE%AD%E5%AD%A6%E6%A0%A1
+ * Time complexity:the worst is O(n^2), but the average is O(nlogN)
+ * Reason: O(n^2) only happened in when the array is decreasing, but we choose the right side become pivot.
+                  Thus, we have n data in array, and each pivot will scan n data to put it to the left side.
+          O(nlogN),since we usually devide the array to two array, then another two... so we have tatally have logN array,
+                  and each array will choose one pivot and scan n data to put it to the correct place and sorting array. Thus, nlogN            
+ * Space complexity: the worst is O(n), but the average is O(logN)
+ */
+ 
+ // The following we choose the right side become the pivot
+//Quick sort is the function to devide the array to many partiton
+public void quickSort(array[], int left, int right) {
+  if (left >= right) return;
+  int partitionIndex = partition(array, left, right);
+  quickSort(array, left, partitionIndex - 1);
+  quickSort(array, partitionIndex + 1, right);
+}
+  
+//The partition is the function to find a pivot and sorting one time.
+public int partition(int[] array, int left, int right){
+  pivot = array[right];
+  smallerIndex = left;
+  biggerIndex = right - 1;
+  while (true) {
+    while(smallerIndex < right && array[smallerIndex] <= pivot) {
+      smallerIndex++;
+    }
+    while (biggerIndex >= left && array[biggerIndex] > pivot) {
+      biggerIndex--;
+    }
+    if (smallerIndex > biggerIndex) break;
+    swap(array, smallerIndex, biggerIndex);  
+  }
+  swap(array, smallerIndex, right); // swap pivot to the right position
+  return smallerIndex;
+}
+
+public void swap(int[] array, int left, int right) {
+  int temp = array[left];
+  array[left] = array[right];
+  array[right] = temp;
+}
+
+
+//**********************************************************
+  //Merge sort
+  // By looking the jGrasp canvas, I found, back and front the step 1, 2, 
+     eg: array = [38,27,43,3,9,82,10]
+     it devide the array to index0,1, then order these two.
+     Then devide array to index2, 3, then order these two.
+     then index0 to 3, then merge these 4
+     The index 4,5. order. The 4 to 6 order. merge these 3
+     Finally merge 0 to 6.
+      
+  
+  public void mergeSort(int[] array) {
+    int[] helper = array.clone();
+    mergeSort(array, helper, 0, array.length - 1);
+    return array;
+  }
+  
+  public void mergeSort(int[] array, int[] helper, int left, int right) {
+    if(right - left < 1) return;
+    int mid = left + (right - left) / 2;
+    mergeSort(array, helper, left, mid);      //-step1
+    mergeSort(array, helper, mid + 1, right); //-step2
+    merge(array, helper, left, mid, right);
+  }
+  
+  public void merge(int[] array, int[] helper, int left, int mid, int right) {
+    for (int i = left; i <= right; i++) {
+      helper[i] = array[i];
+    }
+    int leftStart = left;        
+    int rightStart = mid + 1;    
+    for (int i = left; i <= right; i++) {
+      if (leftStart > mid) {     
+        array[i] = helper[rightStart++];
+      } else if (rightStart > right){
+        array[i] = helper[leftStart++];
+      } else if (helper[leftStart] < helper[rightStart]) {
+        array[i] = helper[leftStart++];
+      } else {
+        array[i] = helper[rightStart++];
+      }
+    }
+  }
+  
+
+    
+    
+    
+      
+
+
+
+
 //**********************************************************
 // BinarySearch for searching INT type
 
@@ -31,4 +160,5 @@ public int binarySearch(int array[], int target) {
 }
     
 //**********************************************************
+
     
