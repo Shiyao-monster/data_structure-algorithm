@@ -1,0 +1,47 @@
+// time and space_complexity are the dimensions of alogrithm, to determine the alogrithm is good or not.
+/**
+ * Time complexity
+ * Space complexity
+ */
+
+//****************************************************************************************
+  There are three comlexity index to tell the time or space_complexity 
+  O     -> Big O    :  the worst situation
+  Ω     -> Big Omega:  the best situation
+  Θ     -> Big theta:  the normal, general, middle. between worst and best situation
+  
+  In the following, we only talk about Big O, which is the common complexity idex.
+  The bigger O(), the bad the alogrithm is.
+  
+  
+//****************************************************************************************
+Time complexity:
+T(n) = O(f(n))
+O stands for linear relation
+f(n) stands for the running times
+n stands for the virable size which is pretty large
+
+Commonly used BigO complexity level analysis for time complexity: from snall to large
+o(1), o(logN), o(n), o(nlogn),             this line is mostly like linear
+o(n^2), o(n^k),o(2^n), o(n!)               this line increased pretty quick
+
+
+//****************************************************************************************
+Space complexity:
+common Big O for space
+O(1):
+int x = 0; int y = 0; x++; y++
+
+O(n):
+int[] newArray = new int[n];
+for (int i = 0; i < n; i++) {
+   newArray[i]=i;
+}
+
+O(n^2):
+2D array,
+matrix
+
+
+
+
