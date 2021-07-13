@@ -1,0 +1,30 @@
+
+//**********************************************************
+// BinarySearch for searching INT type
+
+/**
+ *if total index is even, then just go to the mid index, 
+ *                    odd, then go to the mid left side.
+ * Time Complex: n/2, n/4, n/8, ..., n/2^k
+ *               n/2^k = 1   
+ *               n = 2^k
+ *               k = log_2 n ~> O(logN)
+ */
+public int binarySearch(int array[], int target) {
+  int left = 0;
+  int right = array.length - 1;
+  while(left <= right) {
+     int mid = left + (right - left) / 2;
+     if (array[mid] == target) {
+        return mid;
+     } else if (target < array[mid]) {
+        right = mid - 1;
+     } else {
+        left = mid + 1;
+     }
+  }
+  return -1;
+}
+    
+//**********************************************************
+    
