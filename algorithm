@@ -2,7 +2,7 @@
  * Sorting : inserting sort, Quick sort, Merge Sort 
  * BinarySearch 
  */
- 
+
 //**********************************************************
 Simple introduction
 Inserting sort: Just sorting one by one, for the new element, which compare and scan from back to front
@@ -160,5 +160,5 @@ public int binarySearch(int array[], int target) {
 }
     
 //**********************************************************
-
+Finish
     
