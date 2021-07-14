@@ -1,0 +1,155 @@
+// HashTable and HashMap
+// For now I don't really understand the difference， just know 
+   map allow value and key =null, but table can't be null
+   HashTable使用Enumeration进行遍历，HashMap使用Iterator进行遍历。
+   HashTable中hash数组默认大小是11，增加的方式是 old*2+1。HashMap中hash数组的默认大小是16，而且一定是2的指数。
+   哈希值的使用不同，HashTable直接使用对象的hashCode， 而map是还要 % array.length
+   
+
+//* HashTable:  Searching a element only need O(1)  (synchronized): 
+left  |  right   
+array -> linked list    (each node is a key-value pair. actully, the node.value is <String key, Integer value>)
+array -> linked list
+array -> linked list
+array -> linked list
+
+Campare to 
+Array: easy to find the index, hard to insert and delete
+Linked List: hard to find the index (since we need to interate all from head), but easy to inset and delete
+
+//* Hash function: f(x) = String.hashcode()
+transfer any value to a Hash Value (integer)
+
+//* The process
+****        x   =>  f(x)=Y => Y%Array.length => Array postition pf X =>do operation
+     eg: (A,10) =>  f(A)=4 => 4%6            =>  4                   =>Array[4].add(A,10) // if already have A, then repace the original val
+
+
+
+
+//* Hash table operation
+    get(K key)
+    add(Key key, Value value)
+    remove(Key key)
+    getSize()
+    isEmpty()
+    
+    
+ //************************************************************************************************************************ 
+import java.util.ArrayList;   // additional: List all same value but set don't allow same value; map don't allow same key
+
+public class HashMap {
+    static class HashNode<String, Integer> {
+        String key;
+        Integer value;
+        HashNode<String, Integer> next;
+        public HashNode(String key, Integer value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private ArrayList<HashNode<String, Integer>> bucketArray;
+    private int numBuckets;
+    private int size;   // all of node
+
+    public HashMap() {
+        bucketArray = new ArrayList<>();   // we usually ArrayList<r> arr=new ArrayList<>(16), 
+                                               since if size is small, we need to use generateBiggerArray(), which will lower the hashmap add() speed
+        numBuckets = 10;
+        size = 0;                                 
+        for(int i = 0; i < numBuckets; i++) {
+            bucketArray.add(null);
+        }
+    }
+    
+    private int getBucketIndex(String key) {
+        int hashCode = key.hashCode();   //String.hashcode() is in java System
+        int index = hashCode % numBuckets;
+        return index;
+    }
+    
+    public void add(String key, Integer value) {
+        int bucketIndex = getBucketIndex(key);
+        HashNode<String, Integer> head = bucketArray.get(bucketIndex);
+        while (head != null) {
+            if (head.key.equals(key)) {
+                head.value = value;
+                return;
+            }
+            head = head.next;
+        }
+        size++;
+        head = bucketArray.get(bucketIndex);
+        HashNode<String, Integer> newNode = new HashNode<String, Integer>(key, value);
+        newNode.next = head;
+        bucketArray.set(bucketIndex, newNode);  //ArrayList.set(int index, E element)
+        
+        // if the linkedList is too big/ or the numBucket will full, to generate more numBucket
+        if ((1.0 * size) / numBuckets >= 0.7) {
+            generateBiggerArray();
+        }
+    }
+    
+    private void  generateBiggerArray() {
+          ArrayList<HashNode<String, Integer>> temp = bucketArray;
+          bucketArray = new ArrayList<>();
+          numBuckets = 2 * numBuckets;
+          size = 0;
+          for (int i = 0; i < numBuckets; i++) {
+              bucketArray.add(null);
+          }
+          for (HashNode<String, Integer> headNode : temp) {
+              while(headNode != null) {
+                  add(headNode.key, headNode.value);
+                  headNode = headNode.next;
+              }
+          }
+     }
+    
+
+
+    public Integer get(String key) {
+        int bucketIndex = getBucketIndex(key);
+        HashNode<String, Integer> head = bucketArray.get(bucketIndex);
+        while (head != null) {
+            if (head.key.equals(key)) {
+                return head.value;
+            }
+            head = head.next;
+        }
+        return null;
+    }
+    
+    public Integer remove(String key) {
+        int bucketIndex = getBucketIndex(key);
+        HashNode<String, Integer> head = bucketArray.get(bucketIndex);
+        HashNode<String, Integer> prev = null;
+        while (head != null) {
+            if (head.key.equals(key))
+                break;
+            prev = head;
+            head = head.next;
+        }
+        if (head == null) {
+            return null;
+        }
+        size--;
+        if (prev != null) {
+            prev.next = head.next;
+        } else {
+            bucketArray.set(bucketIndex, head.next);
+        }
+        return head.value;
+    }
+    
+    public int size() {
+          return size;
+      }
+
+    public boolean isEmpty() {
+          return size() == 0;
+     }
+    
+    
+}
