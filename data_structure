@@ -1,8 +1,364 @@
 /**
- * List
+ * array and linked List
  * Stack, Queue
  * Priority Queue, HashTable
  * Tree, Graph
  */
  
+ // This file inculde linked list,  stack ,queue
  
+ 
+ 
+ //**************************************************
+ //linked list
+ /**
+  *single linked list      
+  *two points linked list  
+  * circular linked list   
+  * operation for linked list: crud: insert, read search, update, delete
+  *// if tail == null, then means the linked list is empty list
+   // Node.next means the next node, rather than the  ->
+   // By running in canvas, I found head and tail are the only two variable, which don't have next. 
+      
+      Since we write: head = LinkNode, rather than head.setData() & head.next = newNode. 
+      So head means the first whole node, rather than a sigle node with next. 
+      head's function is more like a index_0 pointer, in order to give the linked list an order.
+      And when we add the first node, we write head = node = tail. In this way, we can add node by insert or add to tail in a certain index.
+      Or we can choose head=node, then append data by while loop getNext() != null.
+   // Time complexity: all of operations are O(n)
+   // New knowege: when delete and update, we use two-pointers (cur and pre) to represent two index.
+     
+   
+  // single linked list
+  public class LinkedList {
+    static class ListNode {
+      int val;
+      ListNode next;
+      public ListNode(int val) {
+        this.val = val;
+        this.next = null;
+      }
+      public int getData() {
+         return this.val;
+      }
+
+      public void setData(int d) {
+        this.val = d;
+      }
+
+      public ListNode getNext() {
+        return this.next;
+      }
+
+      public void setNext(ListNode n) {
+        this.next = n;
+      }
+      
+
+    }
+    ListNode head;
+    ListNode tail;
+    int size;
+    public LinkedList() {
+      head = null;
+      tail = null;
+      size = 0;
+    }
+    //Insert new node to the tail
+    public void append(int number) {
+      ListNode newNode = new ListNode(number);
+      if (tail == null) {
+        head=tail=newNode;
+      } else {
+        tail.next = newNode;
+        tail = newNode;
+      }
+      size++;
+    }
+    
+    //Inset new node to any position
+    public void insert(int position, int number) {
+      if (position > size) {
+        return;
+      }
+      ListNode newNode = new ListNode(number);
+      if (position == 0) {
+        newNode.next = head;
+        head = newNode;
+        if (tail == null) { //when the newNide is the first node in the linked list
+          tail = newNode;
+        }
+        size++;
+      } else if (position == size) {
+        this.append(number);
+      } else {
+        ListNode pre = head;
+        for(int i = 0; i < position -1; i++) {
+          pre = pre.next;
+        }
+        ListNode next = pre.next;
+        newNode.next = next;
+        pre.next = newNode;
+        size++;
+      }
+    }
+     public String toString() {
+       String result = "";
+       ListNode current = head;
+       while(current.getNext() != null){
+          result += current.getData();
+          result += ", ";
+          current = current.getNext();
+       }
+       result += current.getData();
+       return "List: " + result;
+     }
+     
+     
+     public void delete(int number){
+       if(head != null && head.val == number) {
+         head = head.next;
+         size--;
+         if (size == 0) {
+           tail = head;  // no element, so tail = head = null
+         }
+       } else {
+         ListNode pre = head;
+         ListNode cur = head;
+         while (pre != null && cur != null) {
+           if (cur.val == number) {
+             if (cur == tail) {
+               tail = pre;
+             }
+             pre.next = cur.next;
+             size--;
+             return;
+           }
+           pre = cur;
+           cur = cur.next;
+         }
+       }
+     }
+     
+     public int search(int number) {
+       ListNode cur = head;
+       for(int index = 0; cur!=null; index++) {
+         if(cur.val == number) {
+           return index;
+         }
+         cur = cur.next;
+       }
+       return -1;
+       }
+     }
+     
+     public int update(int oldVal, int newVal) {
+       ListNode cur = head;
+       for(in index = 0; cur != null; index++) {
+           if(cur.val = oldVal) {
+             cur.val = newVal;
+             return index;
+           }
+           cur = cur.next;
+        }
+        return -1;
+      }
+           
+}
+        
+//**************************************************************
+// Stack: like a trash bag, first in, last out.
+          push: push in
+          pop:  pop out
+          isEmpty
+
+//  Use array[] to set up Stack
+public class Stack {
+    static final int CAPACITY = 1000;
+    int top;
+    int stack[];
+
+    public Stack() {
+        top = -1;
+        stack = new int[CAPACITY];
+    }
+    
+    public boolean push(int val) {
+       if (top >= (CAPACITY - 1)) {
+           System.out.println("Stack Overflow.");
+           return false;
+       }
+       stack[++top] = val;
+       return true;
+    }
+    
+    public int pop() {
+        if (top < 0) {
+            System.out.println("Stack Underflow.");
+            return Integer.MIN_VALUE;
+        }
+        int element = stack[top--];
+        return element;
+    }
+    
+    public int peek() {  // check the top element
+         if (top < 0) {
+             System.out.println("Stack Underflow");
+             return 0;
+         }
+         int element = stack[top];
+         return element;
+     }
+
+     public boolean isEmpty() {
+         return top < 0;
+     }
+
+}
+
+// Use linkedList to set up stack
+public class ListStack {
+
+    static class StackNode {
+        int val;
+        StackNode next;
+        StackNode(int val) {
+            this.val = val;
+        }
+    }
+
+    StackNode top;
+
+    public ListStack() {
+        top = null;
+    }
+    
+    public void push(int val) {
+        StackNode newNode = new StackNode(val);
+        if (top == null) {
+            top = newNode;
+        } else {
+            newNode.next = top;
+            top = newNode;
+        }
+        System.out.println(val + " is pushed to stack.");
+    }
+
+    public int pop() {
+        if (top == null) {
+            System.out.println("Stack is Empty.");
+            return Integer.MIN_VALUE;
+        }
+        int popped = top.val;
+        top = top.next;
+        return popped;
+    }
+    
+    public int peek() {
+        if (top == null) {
+            System.out.println("Stack is empty.");
+            return Integer.MIN_VALUE;
+        }
+        return top.val;
+    }
+
+    public boolean isEmpty() {
+        return top == null;
+    }
+    
+}
+
+//*******************************************************************
+// Queue : first in, firt out
+            enqueue : add an element
+            dequeue: delete
+            peek: check the foremost element
+
+
+// Use array[] to create a circular queue
+
+public class ArrayQueue {
+    int front, rear, size;   // front and rear are two pointers: front for dequeue, rear for enqueue
+    int capacity;
+    int array[];
+
+    public ArrayQueue(int capacity) {
+        this.capacity = capacity;
+        front = rear = size = 0;
+        array = new int[capacity];
+    }
+    
+    public void enqueue(int item) {
+        if (isFull()) return;
+        array[rear] = item;
+        rear = (rear + 1) % capacity;
+        size++;
+        System.out.println(item + " is enqueued.");
+    }
+
+    public int dequeue() {
+        if (isEmpty()) return Integer.MIN_VALUE;
+        int item = array[front];
+        front = (front + 1) % capacity;
+        size --;
+        return item;
+    }
+    
+    public int peek() {
+        if (isEmpty()) return Integer.MIN_VALUE;
+        return array[front];
+    }
+
+    public boolean isFull() {
+        return size == capacity;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }   
+}
+
+
+// Use linked list to set up a normal queue
+public class ListQueue {
+
+    QueueNode front;
+    QueueNode rear;
+
+    static class QueueNode {
+        int value;
+        QueueNode next;
+        public QueueNode(int value) {
+            this.value = value;
+        }
+    }
+    
+    public void enqueue(int value) {
+        QueueNode newNode = new QueueNode(value);
+        if (this.rear == null) { // Queue is empty
+            this.front = this.rear = newNode;
+            return;
+        }
+        this.rear.next = newNode;
+        this.rear = newNode;
+    }
+
+    public int dequeue() {
+        if (this.front == null) {
+            System.out.println("The queue is empty.");
+            return Integer.MIN_VALUE;
+        }
+        QueueNode frontNode = this.front;
+        this.front = this.front.next;
+        if (this.front == null) {
+            this.rear = null;
+        }
+        return frontNode.value;
+    }
+}
+
+
+  
+      
+  
+  
