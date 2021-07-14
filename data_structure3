@@ -1,0 +1,243 @@
+/** Tree
+  * Introduction
+  * BST (binary search tree)
+  * Tree Traversal (Preorder, Inorder, Postorder)
+  */
+
+//*************************************************
+//Introduction
+      Root  (Parent Node)
+(Left  |    Right) Child Node
+
+leaf node: the node which don't have child 
+edge: the link between node
+subtree: the collection of parent node and child node
+hight: the num of edge of a node to the leaf node
+depth: the num of edge of a node to the root
+
+//*************************************************
+// kinds of Tree
+Binary Tree include many more specific kinds, like BST, AVL Tree...
+* Binary Tree: each node at most has 2 child node
+* Full Binary Tree: except leaf, each node have 2 child node
+* Complete Binary Tree: except the last layers, the shape should be a triangle. 
+                        The last layers, the node should from left to right
+* Binary Search Tree (BST): 每个节点的数值比左子树上的每个节点都大，比所有右子树上的节点都小。
+* AVL Tree: (平衡二叉树) 任何节点的两颗子树的高度差不大于1的二叉树
+* B-Tree：B树和 AVL 一样，只不过它是一种多叉树（一个节点的子节点数量可以超过二）。
+* Red—Black Tree：是一种自平衡二叉寻找树。like combine AVL and BST
+
+//***************************************************
+//BST
+Add: add node to an empty node
+Delete: 1: delelte the leaf
+        2: delete the node which only have one child
+        3: delete the node which only have two child
+            to replace the node :
+            solution1: the biggest node of left child
+            solution2: the smallest node of the right chhild
+           
+//********************************************************
+
+public class BST {
+
+    static class TreeNode {
+        public int value;
+        public TreeNode left;
+        public TreeNode right;
+        public TreeNode(int value) {
+            this.value = value;
+        }
+    }
+
+    private TreeNode root;
+}
+
+
+public void insert(int key) { //only insert to the leaf position
+    if(root == null) {
+        root = new TreeNode(key);
+        return;
+    }
+    TreeNode current = root;
+    TreeNode parent = null;
+    while(true) {
+        parent = current;
+        if(key < parent.value) {  
+            current = parent.left;
+            if(current == null) {
+                parent.left = new TreeNode(key);
+                return;
+            }
+        } else if (key > parent.value){
+            current = parent.right;
+            if(current == null) {
+                parent.right = new TreeNode(key);
+                return;
+            }
+        } else {
+            return; // else: key=parent.value; BST does not allow nodes with the same value
+        }
+    }
+}
+
+
+public TreeNode get(int key) {
+    TreeNode current = root;
+    while(current != null && current.value != key) {
+        if (key < current.value) {
+            current = current.left;
+        } else if (key > current.value) {
+            current =current.right;
+        }
+    }
+    return current == null ? null : current;
+}
+
+
+
+public boolean delete(int key) {
+    TreeNode parent = root;
+    TreeNode current = root;
+    boolean isLeftChild = false;
+    while(current != null && current.value != key) {  // current will be the "key"
+        parent = current;
+        if(current.value  > key) { 
+            isLeftChild = true;      // the key may in the left child 
+            current = current.left;  // then the current (key) will be the parent's left child.
+        } else {
+            isLeftChild = false;
+            current = current.right;
+        }
+    }
+    if(current == null) {
+        return false;
+    }
+    // Case 1: if node to be deleted has no children
+    if(current.left == null && current.right == null) {
+        if(current == root) {
+            root = null;
+        } else if(isLeftChild) {
+            parent.left = null;
+        } else {
+            parent.right = null;
+        }
+    // Case 2: if node to be deleted has only one child, then the child will replace the node
+    } else if (current.right == null) {
+        if(current == root) {
+            root = current.left;
+        } else if (isLeftChild) {
+            parent.left = current.left;
+        } else {
+            parent.right = current.left;
+        }
+    } else if (current.left == null) {
+        if(current == root) {
+            root = current.right;
+        } else if (isLeftChild) {
+            parent.left = current.right;
+        } else {
+            parent.right = current.right;
+        }       
+                                                      // Case 3: current.left != null && current.right != null 
+                                                      // solution1: to choose the largest node of left. solution2: choose the smallest node of right 
+                                                      //* we choose solution2 . so we should always to find the left sub stree, until null. 
+                                                      //  Then put the successor's right child to the successor's parent's left
+      } else {  // this part only do replace the deleted by the successor, and connet the successor's left branch
+        TreeNode successor = getSuccessor(current);    
+        if (current == root) {
+            root = successor;
+        } else if (isLeftChild) {
+            parent.left = successor;
+        } else {
+            parent.right = successor;
+        }
+        successor.left = current.left;
+    }
+    return true;
+}
+
+//getSuccessor(): to get Successor; and manage the all of remaining branch of the successor
+private TreeNode getSuccessor(TreeNode node) { // this node is the will be deleted node 
+    TreeNode successor = null;
+    TreeNode successorParent = null;
+    TreeNode current = node.right;
+    while (current != null) {   
+        successorParent = successor;    
+        successor = current;
+        current = current.left;              // continue to find the last left node in the right subtree, until null
+    }                                        // Here, current = null, and successor will be the smallest left
+    
+    if (successor != node.right) {     // If successor = node.right, it means, the right subtree doesn't have left branch.
+                                       // Hence, the right branch directly go up, and we alreay wrote it successParent = successor = current = node.right in while loop
+        
+        successorParent.left= successor.right; //put the successor's right child to the successor's parent's left
+        successor.right = node.right;          
+    }
+    return successor;
+}
+
+//*********************************************************************************************
+Traveral the tree, to print the tree value in different order
+
+Pre-order: self -> left -> right
+在前序遍历中，先访问节点自己，然后访问左子树，最后再访问右子树，对于每个节点迭代此操作：
+        1
+       /\
+      2  5
+     /\
+    3  4
+       
+public static void preOrderTraversal(TreeNode root) {
+    if(root == null) {
+        return;
+    }
+    System.out.println(root.value);
+    preOrderTraversal(root.left);
+    preOrderTraversal(root.right);
+}
+
+
+中序遍历 Inorder Traversal: ：left -> self -> right
+在中序遍历中，先访问左子树上的节点，再访问自己，最后再访问右子树上的节点
+       4
+      / \
+     2   5
+    /\
+   1  3
+public static void inOrderTraversal(TreeNode root) {
+    if(root == null) {
+        return;
+    }
+    inOrderTraversal(root.left);
+    System.out.println(root.value);
+    inOrderTraversal(root.right);
+}
+
+后序遍历 Postorder Traversal : left -> right -> self
+在后序遍历中，先访问左右子树，最后再访问自己：
+       5
+      /\
+     3  4
+    /\
+    1 2
+public static void postOrderTraversal(TreeNode root) {
+    if(root == null) {
+        return;
+    }
+    postOrderTraversal(root.left);
+    postOrderTraversal(root.right);
+    System.out.println(root.value);
+}
+
+
+
+
+
+
+
+
+
+
+               
+
