@@ -1,0 +1,168 @@
+//Graph
+/**
+ * Graph definition
+ * Directed Graph
+ * Graph traversal (DFS, BFS) --Depth-first Search,Breadth-first search
+   //Actually, in Tree, it also have these two traversal methods
+ */
+
+//***********************************************************
+Graph, connet data
+vertice and edge
+
+a---b        V = {a, b, c, d, e}，E = {ab, ac, bd, cd, de}
+|   |
+c---d--e
+
+Kinds: Undirected Graph; 
+       Directed Graph; 
+       Weighted Graph：在权重图中，每条相连线有各自的权重。which may don't have direction
+       
+ //***********************************************************
+ Directed Graph
+ 1.Using matrix (waste space)
+     i = row index, j= colum index   i,j are vertice
+     M[i][j] = 1 then, i have connet with j
+             = 0         don't
+  2. Using Array list,  each vertice have a Array list
+      0 ->1,4, means 0->1 and 0->4
+      1 ->0,2        1->0     1->2
+      
+public class ListGraph {
+
+    ArrayList<ArrayList<Integer>> graphs;
+
+    public ListGraph(int v) {
+        graphs = new ArrayList<>(v);
+        for (int i = 0; i < v; i++) {
+            graphs.add(new ArrayList<>());
+        }
+    }
+
+    public void addEdge(int start, int end) {
+        graphs.get(start).add(end);
+    }
+
+    public void removeEdge(int start, int end) {
+        graphs.get(start).remove((Integer)end);
+    }
+}
+
+  
+//********************************************************************************
+Graph Traversal
+In tree:
+DFS: start the root, and pick a road to the end, the come back. 
+     If have a branch when come back, then go to the branch, then come back..
+BFS: start from the root, then go the the place which the edge of the root is smallest, ...
+
+In directed graph:
+DFS: Thinking this graph has not been touch yet. 
+     Then choose a vertive randomly, like A
+     Go to the connected vertice which has not been touch.
+     *We didn't touch a vertice twice.
+     Until all of vertice connected to A are touched, which follow the direction
+     Then find another untouched vertice
+     
+     
+  以下代码访问的每个顶点的index,而不是顶点的value,如果要打印value，则需要改变listGraph,让每个vertice改成 Integer -> <integer, value>   
+  概述遍历顺序： 会以listgraph的元素插进来的顺序来优先遍历, 比如在index0,先插入3,再插入2，遍历也都会先遍历3
+               即使index5,index6和其他4个没有关联，也会在最后先output5, 再6
+  
+  listgraph： [ [1,3,2], [3], [], [4], [], [], []  ]
+          index:  0      1    2   3    4   5   6
+ 
+ BFS result: 0 -> 1 -> 3 -> 2 -> 4 -> 5 -> 6 ->
+ DFS       : 0 -> 1 -> 3 -> 4 -> 2 -> 5 -> 6 ->
+
+public class GraphTraversal {
+
+    ListGraph graph;
+    boolean[] visited;
+
+    public GraphTraversal(ListGraph listGraph) {
+        this.graph = listGraph;
+        visited = new boolean[listGraph.graphs.size()];  // the size of visited is all vertice// the defalut is false
+    }
+
+    public void DFSTraversal(int v) {
+        if(visited[v]) return;
+        visited[v] = true;
+        System.out.print(v + " -> ");
+        Iterator<Integer> neighbors = graph.graphs.get(v).listIterator();
+        while (neighbors.hasNext()) {             //this step is continue to find the sublink of the subnode, until null, since DFSTraversal(nextNode) 
+                                                  // eg:DFSTraversal(0), then index 0's child [1]->[3]->[4], then comeback to index0's child[3],but alreay output, 
+                                                  // so comeback to  index0's child[2]
+            int nextNode = neighbors.next();
+            if (!visited[nextNode]) {
+                DFSTraversal(nextNode);
+            }
+        }
+    }
+    
+    ppublic void DFS() {
+        for (int i = 0; i < graph.graphs.size(); i++) {
+            if (!visited[i]) {
+                DFSTraversal(i);
+            }
+        }
+    }
+    
+    public void BFSTraversal(int v) {   // explaination is in below  and take eg of when index=0
+        Deque<Integer> queue = new ArrayDeque<>();
+        visited[v] = true;                    
+        queue.offerFirst(v);                        //@0: store 0 to queue 
+        while (queue.size() != 0) { 
+            Integer cur = queue.pollFirst();        //@2: poll 1, then cur=1  //@4
+            System.out.print(cur + " -> ");
+            Iterator<Integer> neighbors = graph.graphs.get(cur).listIterator();   //@3: store all of index1's child, 3 but fail, since 3 already store...@5.
+            while (neighbors.hasNext()) {           // @1: this step is store cur 节点的所有连接者， eg: cur = 0, then will store[1,3,2] in the tail
+                int nextNode = neighbors.next();
+                if (!visited[nextNode]) {
+                    visited[nextNode] = true;
+                    queue.offerLast(nextNode);      //@finally, this BFSTraversal(0) will output 0 -> 1 -> 3 -> 2 -> 4 ->  
+                                                    //@finally+1: BFSTraversal(5), output 5->
+                }
+            }
+        }
+    }
+
+    public void BFS() {
+        for (int i = 0; i < graph.graphs.size(); i++) {
+            if (!visited[i]) {
+                BFSTraversal(i);
+            }
+        }
+    }
+    
+}
+
+
+//Explaination for BFS
+Deque: default size: 16, allow same value
+
+queue.offerFirst(1); 
+queue.offerFirst(2);
+ eg:
+ * *  * * ********************* 2 1
+index:  15 14 ................. 1 0
+                                ^
+                               head:    index1 is head after two offerFirst, so if pollFirst(), then index1 will become null
+que.offerFirst(3);                                  
+queue.offerLast(3);
+queue.offerLast(4);
+
+eg:
+         3 4  * * ********************3 2 1
+index:  15 14 ........................2 1 0
+           ^                          ^
+          tail                       head
+          
+if pollFirst() after 3 times, then pollFirst will poll index15, then index14
+
+
+So in BST, we use Deque can store two kinds value, for which should scan first, and for some connected value, we can store in tail, then poll.
+
+
+
+  
